@@ -1,0 +1,58 @@
+﻿@page "/todos"
+@using CleanArchTodoApp.Application
+@using CleanArchTodoApp.Application.Interfaces;
+@using CleanArchTodoApp.Domain
+@inject ITodoService TodoService
+
+
+@if (StateService.Loading)
+{
+    <LoadingIndicator />
+} else
+{
+    <h3>Todo List</h3>
+
+    <ul>
+        @if (todos != null)
+        {
+            @foreach (var todo in todos)
+            {
+                <li>@todo.Title (@(todo.IsDone ? "Done" : "Not done"))</li>
+            }
+        }
+        else
+        {
+            <p>No todos available.</p>
+        }
+
+    </ul>
+}
+
+
+
+
+@code {
+    private IEnumerable<TodoItem> todos;
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            StateService.TurnOnLoading();
+            todos = await TodoService.GetTodosAsync();
+            StateHasChanged();
+        }
+        catch
+        {
+            // Handle errors
+        }
+        finally
+        {
+            //StateService.TurnOffLoading();
+            StateHasChanged(); 
+        }
+    }
+
+}
